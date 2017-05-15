@@ -1,0 +1,71 @@
+create or replace trigger student_grade
+before insert or update of marks on student_exam
+for each row
+declare ispresent number;
+   begin
+   case
+  when inserting then
+   if :new.marks>70 then
+   insert into student_grades values(:new.student_id,'a'); 
+   end if;
+    if :new.marks<70 and :new.marks>50 then
+   insert into student_grades values(:new.student_id,'b'); 
+   end if;
+    if :new.marks<50 then
+   insert into student_grades values(:new.student_id,'c'); 
+   end if;
+when updating then
+ select count(*) into ispresent from student_grades where student_id=:new.student_id;
+   if(ispresent=0)then
+   if :new.marks>70 then
+   insert into student_grades values(:new.student_id,'a');   end if;
+    if :new.marks<70 and :new.marks>50 then
+   insert into student_grades values(:new.student_id,'b');  end if;
+    if :new.marks<50 then
+   insert into student_grades values(:new.student_id,'c'); 
+   end if;   end if;
+    if(ispresent>0)then if :new.marks>70 then
+  update student_grades set grade='a' where student_id=:new.student_id;   end if;
+    if :new.marks<70 and :new.marks>50 then
+   update student_grades set grade='b' where student_id=:new.student_id;  
+   end if;
+   if :new.marks<50  then
+   update student_grades set grade='c' where student_id=:new.student_id;  
+   end if;  
+   end if;
+  end case;
+end;
+create or replace trigger salary_range_faculty
+before insert or update of salary on faculty
+for each row
+declare ispresent number;
+Begin
+case
+when inserting then
+if :new.salary&gt;60000 then
+insert into faculty_salary values(:new.faculty_id,&#39;high&#39;);end if;
+if :new.salary&lt;60000 and :new.salary&gt;40000 then
+insert into faculty_salary values(:new.faculty_id,&#39;medium&#39;);
+end if;
+if :new.salary&lt;40000 then
+insert into faculty_salary values(:new.faculty_id,&#39;low&#39;);
+end if;
+when updating then
+select count(*) into ispresent from faculty_salary where faculty_id=:new.faculty_id;
+if(ispresent=0)then
+if :new.salary&gt;60000 then
+insert into faculty_salary values(:new.faculty_id,&#39;high&#39;);
+end if; if :new.salary&lt;60000 and :new.salary&gt;40000 then
+insert into faculty_salary values(:new.faculty_id,&#39;medium&#39;);
+end if;
+if :new.salary&lt;40000 then
+insert into faculty_salary values(:new.faculty_id,&#39;low&#39;);
+end if; end if;
+if(ispresent&gt;0)then
+if :new.salary&gt;60000 then
+update faculty_salary set salary=&#39;high&#39; where faculty_id=:new.faculty_id; end if;
+if :new.salary&lt;60000 and :new.salary&gt;40000 then
+update faculty_salary set salary=&#39;medium&#39; where faculty_id=:new.faculty_id;end if;
+if :new.salary&lt;40000 then
+update faculty_salary set salary=&#39;low&#39; where faculty_id=:new.faculty_id; end if;
+end if;end case; end;
